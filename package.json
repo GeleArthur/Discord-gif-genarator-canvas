@@ -12,6 +12,9 @@
     "canvas": "^2.6.0",
     "discord.js": "^11.5.1",
     "gifencoder": "^2.0.1",
+    "jsdom": "^15.2.0",
+    "matter-js": "^0.14.2",
+    "p5": "^0.10.2",
     "stream-to-array": "^2.3.0"
   }
 }
