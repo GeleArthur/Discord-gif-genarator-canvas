@@ -22,13 +22,18 @@ module.exports = {
         const context = canvas.getContext('2d');
 
         var engine = Matter.Engine.create();
-        var boxA = Matter.Bodies.rectangle(50, 100, 10, 10);
-        var boxB = Matter.Bodies.rectangle(200, 50, 30, 30);
+        // var boxA = Matter.Bodies.rectangle(50, 100, 10, 10,{restitution:1});
+        // var boxB = Matter.Bodies.rectangle(200, 50, 30, 30);
         var ground = Matter.Bodies.rectangle(0, 240, 320*2, 10, { isStatic: true });
 
-        Matter.World.add(engine.world, [boxA, boxB, ground]);
+        Matter.World.add(engine.world, [ground]);
 
-        for (let k = 0; k < 10; k++) {
+        for (let k = 0; k < 100; k++) {
+            if(k%3 == 2){
+                let box = Matter.Bodies.rectangle(Math.random() * (canvas.width - 0) + 0, 100, 10, 10,{restitution:1});
+                Matter.World.add(engine.world, box);
+            }
+
             Matter.Engine.update(engine, 1000 / 42);
             
             var bodies = Matter.Composite.allBodies(engine.world);
@@ -39,16 +44,18 @@ module.exports = {
             context.fillStyle = '#FF0000';
         
             for (var i = 0; i < bodies.length; i++) {
-                    console.log('e')
-                    let box = Matter.Bodies.rectangle(50, 100, 10, 10);
-                    Matter.World.add(engine.world, box);
                 
+                
+                let bounds = {x:bodies[i].bounds.max.x - bodies[i].bounds.min.x,
+                    y:bodies[i].bounds.max.y - bodies[i].bounds.min.y}
+                let pos = {x:bodies[i].position.x - bounds.x/2,y:bodies[i].position.y - bounds.y/2}
 
-                var pos = bodies[i].position;
-                let bounds = bodies[i].bounds
-                context.beginPath();
-                context.rect(pos.x, pos.y, bounds.max.x - bounds.min.x , bounds.max.y - bounds.min.y);
-                context.stroke();
+
+                context.translate(pos.x,pos.y)
+                context.rotate(bodies[i].angle)
+                context.fillRect(bounds.x/2, bounds.y/2, bounds.x, bounds.y);
+                context.setTransform(1, 0, 0, 1, 0, 0);
+
 
             }
         
