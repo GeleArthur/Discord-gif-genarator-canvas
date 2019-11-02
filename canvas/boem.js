@@ -5,9 +5,15 @@ const Matter = require("matter-js");
 
 module.exports = {
   name: "boem",
-  execute(msg) {
+  execute(msg,args) {
     msg.channel.send("loading").then(() => {
-      const myimg = nodeCanvas.loadImage(msg.author.avatarURL);
+      
+      let myimg
+      if(msg.mentions.users.array().length == 0){
+        myimg = nodeCanvas.loadImage(msg.author.avatarURL)
+      }else{
+        myimg = nodeCanvas.loadImage(msg.mentions.users.array()[0].avatarURL)
+      }
 
       const recoder = new util.Record();
       recoder.makeGifEncoder(320, 240);
@@ -27,14 +33,14 @@ module.exports = {
       Matter.World.add(engine.world, ground);
 
       var boxes = [];
-      let boxsize = 20
+      let boxsize = 20;
 
       for (let x = 0; x < 5; x++) {
         boxes[x] = [];
         for (let y = 0; y < 5; y++) {
           let rect = Matter.Bodies.rectangle(
-            (canvas.width-5*boxsize)-10 + x * boxsize,
-            (canvas.height-5*boxsize)-10 + y * boxsize,
+            canvas.width-100 - 5 * boxsize - 10 + x * boxsize,
+            canvas.height - 5 * boxsize - 10 + y * boxsize,
             boxsize,
             boxsize
           );
@@ -43,17 +49,23 @@ module.exports = {
           Matter.World.add(engine.world, rect);
         }
       }
-      Matter.World.add(engine.world,Matter.Bodies.circle(250,0,10,{mass:10}))
+      let ball = Matter.Bodies.circle(canvas.width/2, 0, 30, { mass: 3 });
+      Matter.World.add(engine.world, ball);
 
-      myimg.then((userimage) => {
+      myimg.then(userimage => {
         for (let f = 0; f < 100; f++) {
           Matter.Engine.update(engine, 1000 / 42);
           context.fillStyle = "#fff";
           context.fillRect(0, 0, canvas.width, canvas.height);
-        
+
+          context.beginPath();
+          context.arc(ball.position.x, ball.position.y, 30, 0, 2 * Math.PI);
+          context.stroke();
+
           for (let x = 0; x < boxes.length; x++) {
             for (let y = 0; y < boxes[x].length; y++) {
-                
+              context.translate(boxes[x][y].position.x, boxes[x][y].position.y);
+              context.rotate(boxes[x][y].angle);
 
               context.drawImage(
                 userimage,
@@ -62,10 +74,15 @@ module.exports = {
                 userimage.width / boxes.length,
                 userimage.height / boxes[x].length,
 
-                boxes[x][y].vertices[0].x,
-                boxes[x][y].vertices[0].y,
-                Math.abs(boxes[x][y].vertices[0].x - boxes[x][y].vertices[2].x),
-                Math.abs(boxes[x][y].vertices[0].y - boxes[x][y].vertices[2].y)
+                -boxsize / 2,
+                -boxsize / 2,
+                boxsize,
+                boxsize
+              );
+              context.rotate(-boxes[x][y].angle);
+              context.translate(
+                -boxes[x][y].position.x,
+                -boxes[x][y].position.y
               );
             }
           }

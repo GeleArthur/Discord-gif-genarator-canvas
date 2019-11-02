@@ -1,24 +1,90 @@
-
 <!-- testing place for the canvas -->
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <script src="../node_modules/matter-js/build/matter.js" type="text/javascript"></script>
+  <head>
+    <script
+      src="../node_modules/matter-js/build/matter.js"
+      type="text/javascript"
+    ></script>
     <title>Matter.js - workspace</title>
-</head>
-<body>
-    <canvas id='canvas' width="320" height="240"></canvas>
+  </head>
+  <body>
+    <canvas id="canvas" width="320" height="240"></canvas>
     <script>
+      var Example = {};
+      var Engine = Matter.Engine,
+        Render = Matter.Render,
+        Runner = Matter.Runner,
+        Composites = Matter.Composites,
+        Common = Matter.Common,
+        MouseConstraint = Matter.MouseConstraint,
+        Mouse = Matter.Mouse,
+        World = Matter.World,
+        Bodies = Matter.Bodies;
 
-        var canvas = document.getElementById('canvas');
-        let ctx = canvas.getContext('2d');
+      // create engine
+      var engine = Engine.create(),
+      world = engine.world;
 
-        const img = new Image()
-        img.src = 'https://mdn.mozillademos.org/files/5397/rhino.jpg';
-        img.onload = ()=>{
-            ctx.drawImage(img,33, 71, 104, 124, 0, 0, 87, 104)
+
+      let box = Bodies.rectangle(50, 0, 64, 64, {
+        render: {
+          strokeStyle: "#ffffff",
+          sprite: {
+            texture: "https://brm.io/matter-js/demo/img/box.png"
+          }
         }
+      });
+      World.add(world, box);
+
+      World.add(world,Bodies.rectangle(0,240,320*2,10,{isStatic: true}))
+
+      const canvas = document.getElementById("canvas");
+      const context = canvas.getContext("2d");
+
+      // add mouse control
+      var mouse = Mouse.create(canvas),
+        mouseConstraint = MouseConstraint.create(engine, {
+          mouse: mouse,
+          constraint: {
+            stiffness: 0.2,
+            render: {
+              visible: false
+            }
+          }
+        });
+
+      World.add(world, mouseConstraint);
+
+      let boximage = new Image();
+      boximage.src = "https://brm.io/matter-js/demo/img/box.png";
+      boximage.onload = () => {
+        requestAnimationFrame(render);
+      };
+
+      requestAnimationFrame(render);
+      function render() {
+        Matter.Engine.update(engine, 1000 / 60);
+        context.fillStyle = "#646464";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        context.translate(box.position.x, box.position.y);
+        context.rotate(box.angle);
+        context.drawImage(
+          boximage,
+          boximage.width * -0.5,
+          boximage.height * -0.5,
+          boximage.width,
+          boximage.height
+        );
+
+        context.rotate(-box.angle);
+        context.translate(-box.position.x, -box.position.y);
+
+
+        requestAnimationFrame(render);
+      }
     </script>
-</body>
+  </body>
 </html>
