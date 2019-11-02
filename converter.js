@@ -1,16 +1,49 @@
 const toArray = require('stream-to-array')
+const GIFEncoder = require('gifencoder');
 
 module.exports = {
-    convert(stream,callback){
+    convert:function convert(stream,callback){
+        // call stream to array
         toArray(stream).then(function (parts){
+        // add all the parts togetter
         const buffers = parts.map(part => Buffer.isBuffer(part) ? part : Buffer.from(part));
-
-
+        // concat then and send them up
         return callback(Buffer.concat(buffers));
         
         })
     },
-    record(){
-        
+    // handels recording
+    Record:class Record{
+        constructor(){
+            this.encoder = null
+            this.stream = null
+        }
+        // creates a encoder
+        makeGifEncoder(width,height){
+            this.encoder = new GIFEncoder(width, height);
+            // put the output in this stream
+            this.stream = this.encoder.createReadStream();
+    
+            // settings
+            this.encoder.start();
+            this.encoder.setRepeat(0);   // 0 for repeat, -1 for no-repeat
+            this.encoder.setDelay(42);  // frame delay in ms
+            this.encoder.setQuality(10); // image quality. 10 is default.
+        }
+        addFrame(context){
+            // add a frame form canvas
+            this.encoder.addFrame(context);
+        }
+        finish(callback){
+            // encoder is done
+            this.encoder.finish();
+            // convert the stream in a buffer for upload
+            module.exports.convert(this.stream,(buffer)=>{
+
+                // give back the buffer
+                return callback(buffer)
+            })
+        }
+
     }
 }

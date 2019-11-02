@@ -1,46 +1,49 @@
-const GIFEncoder = require('gifencoder');
 const { createCanvas } = require('canvas');
-const { convert } = require('../converter')
+const util = require('../converter')
 const Discord = require('discord.js');
 const Matter = require('matter-js')
 
 module.exports = {
     name:"cubes",
     execute(msg){
+    // first send loading to chat then do stuff it waits when you don't do this
     msg.channel.send('loading').then(()=>{
-        const encoder = new GIFEncoder(320, 240);
+        // create a recorder
+        const recorder = new util.Record()
 
-        const readstream = encoder.createReadStream();
+        // give up the canvas size
+        recorder.makeGifEncoder(320,240)
 
-        encoder.start();
-        encoder.setRepeat(0);   // 0 for repeat, -1 for no-repeat
-        encoder.setDelay(42);  // frame delay in ms
-        encoder.setQuality(10); // image quality. 10 is default.
-
-        // use node-canvas
+        // make a canvas
         const canvas = createCanvas(320, 240);
         const context = canvas.getContext('2d');
 
+        // matter.js creation
         var engine = Matter.Engine.create();
-        // var boxA = Matter.Bodies.rectangle(50, 100, 10, 10,{restitution:1});
-        // var boxB = Matter.Bodies.rectangle(200, 50, 30, 30);
         var ground = Matter.Bodies.rectangle(0, 240, 320*2, 10, { isStatic: true });
 
+        // add to world
         Matter.World.add(engine.world, [ground]);
 
-        for (let k = 0; k < 200; k++) {
+        // how many frames are we going to record
+        let Frames = 100
+        // main loop for animation
+        for (let k = 0; k < Frames; k++) {
+            // every frame add a box at random
+            let box = Matter.Bodies.rectangle(Math.random() * (canvas.width - 0) + 0, 100, 10, 10,{restitution:1});
+            Matter.World.add(engine.world, box);
             
-                let box = Matter.Bodies.rectangle(Math.random() * (canvas.width - 0) + 0, 100, 10, 10,{restitution:1});
-                Matter.World.add(engine.world, box);
-            
-
+            // update engine form cubes
             Matter.Engine.update(engine, 1000 / 42);
             
+            // all bodies in a array
             var bodies = Matter.Composite.allBodies(engine.world);
         
+            // clear canvas
             context.fillStyle = '#fff';
             context.fillRect(0, 0, canvas.width, canvas.height);
         
+            // draw all bodies
             for (let i = 0; i < bodies.length; i++) {
                 context.beginPath()
                 context.fillStyle = 'blue';
@@ -52,16 +55,17 @@ module.exports = {
                 context.fill()
             }
 
-            encoder.addFrame(context);
+            // add that frame to the recording
+            recorder.addFrame(context);
         }
 
-        encoder.finish();
-
-        convert(readstream,(buffer)=>{
+        // out loop no more frames to render lets send it
+        recorder.finish((buffer)=>{
+            // returns buffer for discord attachment
             const att = new Discord.Attachment(buffer,'name.gif');
+            // send it
             msg.channel.send(att)
         })
         
-        })
-    }
+    })}
 }

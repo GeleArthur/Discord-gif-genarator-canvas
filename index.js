@@ -1,9 +1,11 @@
 const fs = require('fs');
+// settings width a token a prefix
+const settings = require('./settings')
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
-
+// stolen stuff from https://discordjs.guide/command-handling/
 const commandFiles = fs.readdirSync('./canvas').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
@@ -11,12 +13,10 @@ for (const file of commandFiles) {
 	client.commands.set(command.name, command);
 }
 
-let prefix = '!'
-
 client.on('message', msg => {
-    if (!msg.content.startsWith(prefix) || msg.author.bot) return;
+    if (!msg.content.startsWith(settings.prefix) || msg.author.bot) return;
 
-    const args = msg.content.slice(prefix.length).split(/ +/);
+    const args = msg.content.slice(settings.prefix.length).split(/ +/);
 	const command = args.shift().toLowerCase();
 	if (!client.commands.has(command)) return;
 
@@ -32,4 +32,4 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.login('NjIxNjM5MzI4NzYxOTA1MTYz.Xbyi_w.3Tsh8loCH-zKY0cfcca5SY1uvU8');
+client.login(settings.token);
