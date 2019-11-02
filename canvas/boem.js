@@ -1,3 +1,5 @@
+// BROKEN
+
 const GIFEncoder = require('gifencoder');
 const { createCanvas, Image } = require('canvas');
 const { convert } = require('../converter')
