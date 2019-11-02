@@ -21,8 +21,6 @@ module.exports = {
         // matter.js creation
         var engine = Matter.Engine.create();
         var ground = Matter.Bodies.rectangle(0, 240, 320*2, 10, { isStatic: true });
-
-        // add to world
         Matter.World.add(engine.world, [ground]);
 
         // how many frames are we going to record
