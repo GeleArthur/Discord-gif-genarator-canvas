@@ -32,4 +32,4 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.login('NjIxNjM5MzI4NzYxOTA1MTYz.XbsbmA.fYMtGhiWVtyCV7C2DZOMAU6dc6w');
+client.login('NjIxNjM5MzI4NzYxOTA1MTYz.Xbyi_w.3Tsh8loCH-zKY0cfcca5SY1uvU8');

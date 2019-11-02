@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const Matter = require('matter-js')
 
 module.exports = {
-    name:"colors",
+    name:"cubes",
     execute(msg){
     msg.channel.send('loading').then(()=>{
         const encoder = new GIFEncoder(320, 240);
@@ -28,11 +28,11 @@ module.exports = {
 
         Matter.World.add(engine.world, [ground]);
 
-        for (let k = 0; k < 100; k++) {
-            if(k%3 == 2){
+        for (let k = 0; k < 200; k++) {
+            
                 let box = Matter.Bodies.rectangle(Math.random() * (canvas.width - 0) + 0, 100, 10, 10,{restitution:1});
                 Matter.World.add(engine.world, box);
-            }
+            
 
             Matter.Engine.update(engine, 1000 / 42);
             
@@ -41,24 +41,16 @@ module.exports = {
             context.fillStyle = '#fff';
             context.fillRect(0, 0, canvas.width, canvas.height);
         
-            context.fillStyle = '#FF0000';
-        
-            for (var i = 0; i < bodies.length; i++) {
-                
-                
-                let bounds = {x:bodies[i].bounds.max.x - bodies[i].bounds.min.x,
-                    y:bodies[i].bounds.max.y - bodies[i].bounds.min.y}
-                let pos = {x:bodies[i].position.x - bounds.x/2,y:bodies[i].position.y - bounds.y/2}
-
-
-                context.translate(pos.x,pos.y)
-                context.rotate(bodies[i].angle)
-                context.fillRect(bounds.x/2, bounds.y/2, bounds.x, bounds.y);
-                context.setTransform(1, 0, 0, 1, 0, 0);
-
-
+            for (let i = 0; i < bodies.length; i++) {
+                context.beginPath()
+                context.fillStyle = 'blue';
+                context.moveTo(bodies[i].vertices[0].x ,bodies[i].vertices[0].y)
+                for (let j = 1; j < bodies[i].vertices.length; j++) {
+                    context.lineTo(bodies[i].vertices[j].x,bodies[i].vertices[j].y)
+                }
+                context.closePath()
+                context.fill()
             }
-        
 
             encoder.addFrame(context);
         }

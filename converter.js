@@ -9,5 +9,8 @@ module.exports = {
         return callback(Buffer.concat(buffers));
         
         })
+    },
+    record(){
+        
     }
 }
