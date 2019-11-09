@@ -1,0 +1,86 @@
+<!-- testing place for the canvas -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="../node_modules/matter-js/build/matter.js" type="text/javascript"></script>
+    <title>sourcein - workspace</title>
+</head>
+
+<body>
+    <canvas id="canvas" width="320" height="180"></canvas>
+    <a id='pos'></a>
+    <script>
+        const canvas = document.getElementById('canvas')
+        const context = canvas.getContext("2d");
+
+        let framecount = 0
+
+        let imgUser = new Image()
+        imgUser.onload = requestAnimationFrame(render)
+        imgUser.src = "https://cdn.discordapp.com/avatars/247321523516342272/a0dfe5ef21cef44733587401b56939d3.png?size=2048"
+
+        let pos = document.getElementById("pos")
+
+        function getMousePos(canvas, evt) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
+        let mousex = 0
+        let mousey = 0
+
+        canvas.addEventListener("mousemove", (evt) => {
+            let mousepos = getMousePos(canvas, evt)
+            mousex = mousepos.x
+            mousey = mousepos.y
+            pos.text = `${mousex} , ${mousey}`
+        })
+
+        function render() {
+            framecount++
+
+            context.fillStyle = "#646464";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.save()
+
+            context.beginPath();
+            context.moveTo((75 + x)*size, (40+y)*size );
+            bezierCurveSize(75, 37, 70, 25, 50, 25);
+            bezierCurveSize(20, 25, 20, 62.5, 20, 62.5);
+            bezierCurveSize(20, 80, 40, 102, 75, 120);
+            bezierCurveSize(110, 102, 130, 80, 130, 62.5);
+            bezierCurveSize(130, 62.5, 130, 25, 100, 25);
+            bezierCurveSize(85, 25, 75, 37, 75, 40);
+            context.stroke();
+
+            context.clip();
+            context.fillStyle = "#FF00FF";
+            context.fillRect(0, 200 - framecount, 300, 200)
+
+            context.restore();
+
+            requestAnimationFrame(render);
+        }
+
+        let x = 100
+        let y = 30
+        let size = 0.5
+
+        function bezierCurveSize(cp1x, cp1y, cp2x, cp2y, px, py) {
+            context.bezierCurveTo(
+                (cp1x + x) * size,
+                (cp1y + y) * size,
+                (cp2x + x) * size,
+                (cp2y + y) * size,
+                (px + x) * size,
+                (py + y) * size)
+        }
+    </script>
+</body>
+
+</html>
