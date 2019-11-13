@@ -5,22 +5,28 @@ const Matter = require("matter-js");
 
 module.exports = {
   name: "love",
+  
+  /**
+   * 
+   * @param {import('discord.js').Message} msg 
+   */
   async execute(msg) {
     // first send loading to chat then do stuff
     await msg.channel.send("loading");
     let userimages = [];
-    if (msg.mentions.users.array().length < 1) {
+    if (msg.mentions.users.array().length < 0) {
       msg.channel.send(
         `please input more then ${msg.mentions.users.array().length} users`
       );
       return;
     } else {
       userimages[0] = nodeCanvas.loadImage(
-        msg.mentions.users.array()[0].avatarURL
+        msg.author.avatarURL
+        // msg.mentions.users.array()[0].avatarURL
       );
-      userimages[1] = nodeCanvas.loadImage(
-        msg.mentions.users.array()[1].avatarURL
-      );
+      // userimages[1] = nodeCanvas.loadImage(
+      //   msg.mentions.users.array()[1].avatarURL
+      // );
     }
 
     // create a recorder
@@ -36,13 +42,22 @@ module.exports = {
     await Promise.all(userimages)
       .then(images => {
         // how many frames are we going to record
-        let Frames = 100;
+        let totalFrames = 100;
         // main loop for animation
-        for (let k = 0; k < Frames; k++) {
-          // add that frame to the recording
-          
+        for (let framecount = 0; framecount < totalFrames; framecount++) {
+          context.fillStyle = "#A689A1"
+          context.fillRect(0, 0, canvas.width, canvas.height);
 
-          context.fillRect(Frames, 0, canvas.width, canvas.height);
+          if (framecount < 20) {
+            context.drawImage(
+              images[0],
+              util.calulations.map(framecount, 0, 20, -30, 50),
+              120,
+              50,
+              50
+            );
+          }
+
           recorder.addFrame(context);
         }
 
